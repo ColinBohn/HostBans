@@ -61,8 +61,22 @@ namespace HostBans
         private void OnConnect(ConnectEventArgs args)
         {
             var player = new TSPlayer(args.Who);
-            System.Net.IPHostEntry host = System.Net.Dns.GetHostByAddress(player.IP);
-            SQL.HostBan ban = SQL.GetBanByHost(host.HostName);
+            string host = SQL.GetHostFromCache(player.IP);
+            if (host == null)
+            {
+                try
+                {
+                    System.Net.IPHostEntry hostname = System.Net.Dns.GetHostByAddress(player.IP);
+                    host = hostname.Hostname;
+                }
+                catch (Exception e)
+                {
+                    host = player.IP;
+                }
+                SQL.InsertCacheEntry(host, player.IP);
+
+            }
+            SQL.HostBan ban = SQL.GetBanByHost(host);
             if (ban != null)
             {
                     TShock.Utils.ForceKick(player, string.Format("Banned for: {0}.", ban.Reason), true, false);
