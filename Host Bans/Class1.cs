@@ -67,7 +67,7 @@ namespace HostBans
                 try
                 {
                     System.Net.IPHostEntry hostname = System.Net.Dns.GetHostByAddress(player.IP);
-                    host = hostname.Hostname;
+                    host = hostname.HostName;
                 }
                 catch (Exception e)
                 {
