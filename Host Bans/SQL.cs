@@ -49,6 +49,39 @@ namespace HostBans
              new SqlColumn("Date", MySqlDbType.Text)
             );
             SQLWriter.EnsureExists(table);
+            var table2 = new SqlTable("hostbans-cache",
+             new SqlColumn("IP", MySqlDbType.Text) { Primary = true, AutoIncrement = true },
+             new SqlColumn("Host", MySqlDbType.Text)
+            );
+            SQLWriter.EnsureExists(table2);
+        }
+        public static bool InsertCacheEntry(string host, string ip)
+        {
+            try
+            {
+                return db.Query("INSERT INTO hostbans-cache (IP, Host) VALUES (@0, @1);", ip, host) != 0;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            return false;
+        }
+        public static string GetHostFromCache(string ip)
+        {
+            try
+            {
+                using (QueryResult reader = db.QueryReader("SELECT Host FROM hostbans-cache WHERE IP=@0", ip))
+                {
+                    if (reader.Read())
+                        return reader.Get<string>("Host");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.ToString());
+            }
+            return null;
         }
         public static HostBan GetBanByHost(string host)
         {
