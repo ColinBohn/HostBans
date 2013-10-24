@@ -49,8 +49,8 @@ namespace HostBans
              new SqlColumn("Date", MySqlDbType.Text)
             );
             SQLWriter.EnsureExists(table);
-            var table2 = new SqlTable("hostbans-cache",
-             new SqlColumn("IP", MySqlDbType.Text) { Primary = true, AutoIncrement = true },
+            var table2 = new SqlTable("hostbanscache",
+             new SqlColumn("IP", MySqlDbType.VarChar, 16) { Unique = true },
              new SqlColumn("Host", MySqlDbType.Text)
             );
             SQLWriter.EnsureExists(table2);
@@ -59,7 +59,7 @@ namespace HostBans
         {
             try
             {
-                return db.Query("INSERT INTO hostbans-cache (IP, Host) VALUES (@0, @1);", ip, host) != 0;
+                return db.Query("INSERT INTO hostbanscache (IP, Host) VALUES (@0, @1);", ip, host) != 0;
             }
             catch (Exception ex)
             {
@@ -71,7 +71,7 @@ namespace HostBans
         {
             try
             {
-                using (QueryResult reader = db.QueryReader("SELECT Host FROM hostbans-cache WHERE IP=@0", ip))
+                using (QueryResult reader = db.QueryReader("SELECT Host FROM hostbanscache WHERE IP=@0", ip))
                 {
                     if (reader.Read())
                         return reader.Get<string>("Host");
