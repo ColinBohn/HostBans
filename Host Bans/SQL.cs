@@ -34,7 +34,7 @@ namespace HostBans
                     };
                     break;
                 case "sqlite":
-                    string sql = Path.Combine(TShock.SavePath, "signs.sqlite");
+                    string sql = Path.Combine(TShock.SavePath, "hostbans.sqlite");
                     db = new SqliteConnection(string.Format("uri=file://{0},Version=3", sql));
                     break;
             }
